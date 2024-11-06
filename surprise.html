@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Surprise!</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: royalblue; /* Royal blue background */
+            color: white; /* White text */
+            margin: 0;
+            padding: 50px;
+        }
+        h1 {
+            font-size: 40px;
+            color: pink; /* Pink color for the Happy Birthday text */
+            font-weight: bold; /* Bold text */
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold; /* Bold text for questions */
+        }
+        .input-container {
+            margin-top: 20px;
+        }
+        #answer {
+            padding: 10px;
+            font-size: 16px;
+            width: 250px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #ff6347; /* Tomato color button */
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e74c3c; /* Darker red when hovered */
+        }
+
+        /* Reveal Image */
+        #image {
+            margin-top: 30px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+            height: 300px;
+            width: 100%;
+        }
+        #reveal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1;
+            transition: opacity 1s ease;
+        }
+        .image-container {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 1s ease-in-out;
+        }
+
+        /* Heart Decorations at the bottom */
+        #hearts {
+            margin-top: 30px;
+            font-size: 30px;
+            color: red; /* Red hearts */
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .question {
+                font-size: 20px;
+            }
+            #answer {
+                width: 70%;
+            }
+        }
+
+        /* Intro page styles */
+        #intro-page {
+            display: block;
+        }
+        #game-page {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Introduction Page -->
+    <div id="intro-page">
+        <h1>Hellooo, Happy Birthday!</h1>
+        <p>Answer these questions to receive your birthday gift 🎁!</p>
+        <button onclick="startGame()">Let's Start!</button>
+        
+        <!-- Red Hearts at the bottom -->
+        <div id="hearts">
+            ❤️ ❤️ ❤️ ❤️
+        </div>
+    </div>
+
+    <!-- Game Page -->
+    <div id="game-page">
+        <div class="question" id="question">What is my favourite colour?</div>
+        <div class="input-container">
+            <input type="text" id="answer" placeholder="Type your answer here">
+            <button onclick="checkAnswer()">Submit Answer</button>
+        </div>
+
+        <div id="image">
+            <div id="reveal"></div>
+            <div class="image-container" id="image-container"></div>
+        </div>
+
+        <audio id="correct-sound" src="correct.mp3"></audio>
+        <audio id="wrong-sound" src="wrong.mp3"></audio>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        const questions = [
+            { question: "What is my favourite colour?", answer: "Pink", imageUrl: "https://drive.google.com/uc?export=view&id=1-LrJmnNXLu4nr1OrcKBOoSWGtjtce0eL" },
+            { question: "What word do you call me that I like the most?", answer: "baccha", imageUrl: "https://drive.google.com/uc?export=view&id=1-IN2Pqv5Jf7K59gkMtB5H3h_0haFPc79" },
+            { question: "What was the day we started talking?", answer: "Saturday", imageUrl: "https://drive.google.com/uc?export=view&id=1-7AOwD9MnvhXEtsJ7xFR6o34bmp-8f1F" }
+        ];
+
+        // Shuffle the questions and start the game
+        function startGame() {
+            document.getElementById("intro-page").style.display = "none";
+            document.getElementById("game-page").style.display = "block";
+            showQuestion();
+        }
+
+        // Show the current question and reset the image container
+        function showQuestion() {
+            document.getElementById("question").innerText = questions[currentQuestion].question;
+            document.getElementById("answer").value = ''; // Clear input field
+            document.getElementById("image").style.display = "none"; // Hide image container
+            document.getElementById("reveal").style.opacity = "1"; // Reset overlay opacity
+        }
+
+        // Check the answer and reveal the image
+        function checkAnswer() {
+            const userAnswer = document.getElementById("answer").value.trim();
+            const correctAnswer = questions[currentQuestion].answer;
+
+            // Play sound based on the answer
+            const correctSound = document.getElementById("correct-sound");
+            const wrongSound = document.getElementById("wrong-sound");
+
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                correctSound.play();
+                revealImage(questions[currentQuestion].imageUrl);
+            } else {
+                wrongSound.play();
+                alert("Oops, try again!");
+                return; // Don't proceed until they get it right
+            }
+
+            // Move to the next question after a delay
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    alert("Congrats! You've completed the quiz 🎉");
+                }
+            }, 3000); // Wait for 3 seconds before showing the next question
+        }
+
+        // Function to reveal the image with animation
+        function revealImage(imageUrl) {
+            const imageContainer = document.getElementById("image-container");
+            imageContainer.style.backgroundImage = `url(${imageUrl})`; // Set the background image
+            document.getElementById("image").style.display = "block"; // Show the image container
+
+            // Add a slight delay to let the image container appear before the overlay fades
+            setTimeout(() => {
+                const reveal = document.getElementById("reveal");
+                reveal.style.opacity = "0"; // Fade out the overlay
+                imageContainer.style.transform = "scale(1.1)";  // Zoom effect
+
+                setTimeout(() => {
+                    imageContainer.style.transform = "scale(1)";  // Reset zoom after 1 second
+                }, 1000);
+            }, 500); // Wait for 500ms to show the background image first
+        }
+    </script>
+
+</body>
+</html>
